@@ -1,6 +1,6 @@
 var ValidatorContext = function (parent) {
 	this.missing = [];
-	this.schemas = parent ? Object.create(parent.schemas) : {};
+	this.schemas = parent ? lang.delegate(parent.schemas) : {};
 };
 
 ValidatorContext.prototype.getSchema = function (url) {
@@ -73,9 +73,9 @@ function recursiveCompare(A, B) {
 		return true;
 	}
 	if (typeof A == "object" && typeof B == "object") {
-		if (Array.isArray(A) != Array.isArray(B)) {
+		if (isArray(A) != isArray(B)) {
 			return false;
-		} else if (Array.isArray(A)) {
+		} else if (isArray(A)) {
 			if (A.length != B.length) {
 				return false
 			}

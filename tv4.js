@@ -11,39 +11,39 @@ define([
 	'dojo/_base/lang',
 	'dojo/has'
 ], function (lang, has) {
-var empty = {},
-	dontEnums = [
-		'toString',
-		'toLocaleString',
-		'valueOf',
-		'hasOwnProperty',
-		'isPrototypeOf',
-		'propertyIsEnumerable',
-		'constructor'
-	],
-	dontEnumsLength = dontEnums.length,
-	getObjectKeys = Object.keys || function (object) {
-		var keys = [];
-		for (var name in object) {
-			if (object.hasOwnProperty(name)) {
-				keys.push(name);
+	var dontEnums = [
+			'toString',
+			'toLocaleString',
+			'valueOf',
+			'hasOwnProperty',
+			'isPrototypeOf',
+			'propertyIsEnumerable',
+			'constructor'
+		],
+		dontEnumsLength = dontEnums.length,
+		getObjectKeys = Object.keys || function (object) {
+			var keys = [];
+			for (var name in object) {
+				if (object.hasOwnProperty(name)) {
+					keys.push(name);
+				}
 			}
-		}
 
-		if (has('bug-for-in-skips-shadowed')) {
-            for (var i = 0, ii = dontEnumsLength; i < ii; i++) {
-                var dontEnum = dontEnums[i];
-                if (object.hasOwnProperty(dontEnum)) {
-                    keys.push(dontEnum);
-                }
-            }
-		}
-		return keys;
-	},
-	toString = {}.toString,
-	isArray = function (obj) {
-		return toString.call(obj) === '[object Array]';
-	};
+			if (has('bug-for-in-skips-shadowed')) {
+				for (var i = 0, ii = dontEnumsLength; i < ii; i++) {
+					var dontEnum = dontEnums[i];
+					if (object.hasOwnProperty(dontEnum)) {
+						keys.push(dontEnum);
+					}
+				}
+			}
+			return keys;
+		},
+		toString = {}.toString,
+		isArray = function (obj) {
+			return toString.call(obj) === '[object Array]';
+		};
+
 var ValidatorContext = function (parent) {
 	this.missing = [];
 	this.schemas = parent ? lang.delegate(parent.schemas) : {};
@@ -199,6 +199,7 @@ ValidatorContext.prototype.validateEnum = function validateEnum(data, schema) {
 	}
 	return new ValidationError(ErrorCodes.ENUM_MISMATCH, "No enum match for: " + JSON.stringify(data));
 }
+
 ValidatorContext.prototype.validateNumeric = function validateNumeric(data, schema) {
 	return this.validateMultipleOf(data, schema)
 		|| this.validateMinMax(data, schema)
@@ -340,6 +341,7 @@ ValidatorContext.prototype.validateArrayItems = function validateArrayItems(data
 	}
 	return null;
 }
+
 ValidatorContext.prototype.validateObject = function validateObject(data, schema) {
 	if (typeof data != "object" || data == null || isArray(data)) {
 		return null;
@@ -705,3 +707,4 @@ var publicApi = {
 return publicApi;
 
 });
+

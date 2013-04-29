@@ -1,5 +1,5 @@
 ValidatorContext.prototype.validateArray = function validateArray(data, schema) {
-	if (!Array.isArray(data)) {
+	if (!isArray(data)) {
 		return null;
 	}
 	return this.validateArrayLength(data, schema)
@@ -40,7 +40,7 @@ ValidatorContext.prototype.validateArrayItems = function validateArrayItems(data
 		return null;
 	}
 	var error;
-	if (Array.isArray(schema.items)) {
+	if (isArray(schema.items)) {
 		for (var i = 0; i < data.length; i++) {
 			if (i < schema.items.length) {
 				if (error = this.validateAll(data[i], schema.items[i])) {

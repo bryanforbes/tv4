@@ -16,7 +16,7 @@ ValidatorContext.prototype.validateType = function validateType(data, schema) {
 	var dataType = typeof data;
 	if (data == null) {
 		dataType = "null";
-	} else if (Array.isArray(data)) {
+	} else if (isArray(data)) {
 		dataType = "array";
 	}
 	var allowedTypes = schema.type;

@@ -6,7 +6,7 @@ function normSchema(schema, baseUri) {
 		schema.id = baseUri;
 	}
 	if (typeof schema == "object") {
-		if (Array.isArray(schema)) {
+		if (isArray(schema)) {
 			for (var i = 0; i < schema.length; i++) {
 				normSchema(schema[i], baseUri);
 			}

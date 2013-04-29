@@ -1,5 +1,5 @@
 ValidatorContext.prototype.validateObject = function validateObject(data, schema) {
-	if (typeof data != "object" || data == null || Array.isArray(data)) {
+	if (typeof data != "object" || data == null || isArray(data)) {
 		return null;
 	}
 	return this.validateObjectMinMaxProperties(data, schema)
@@ -10,7 +10,7 @@ ValidatorContext.prototype.validateObject = function validateObject(data, schema
 }
 
 ValidatorContext.prototype.validateObjectMinMaxProperties = function validateObjectMinMaxProperties(data, schema) {
-	var keys = Object.keys(data);
+	var keys = getObjectKeys(data);
 	if (schema.minProperties != undefined) {
 		if (keys.length < schema.minProperties) {
 			return new ValidationError(ErrorCodes.OBJECT_PROPERTIES_MINIMUM, "Too few properties defined (" + keys.length + "), minimum " + schema.minProperties).prefixWith(null, "minProperties");
@@ -82,7 +82,7 @@ ValidatorContext.prototype.validateObjectDependencies = function validateObjectD
 					if (data[dep] === undefined) {
 						return new ValidationError(ErrorCodes.OBJECT_DEPENDENCY_KEY, "Dependency failed - key must exist: " + dep).prefixWith(null, depKey).prefixWith(null, "dependencies");
 					}
-				} else if (Array.isArray(dep)) {
+				} else if (isArray(dep)) {
 					for (var i = 0; i < dep.length; i++) {
 						var requiredKey = dep[i];
 						if (data[requiredKey] === undefined) {

@@ -113,4 +113,4 @@ var publicApi = {
 	errorCodes: ErrorCodes
 };
 
-global.tv4 = publicApi;
+return publicApi;
