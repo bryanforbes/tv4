@@ -7,10 +7,46 @@ This code is released into the "public domain" by its author(s).  Anybody may us
 If you find a bug or make an improvement, it would be courteous to let the author know, but it is not compulsory.
 **/
 
-(function (global) {
+define([
+	'dojo/_base/lang',
+	'dojo/has'
+], function (lang, has) {
+var empty = {},
+	dontEnums = [
+		'toString',
+		'toLocaleString',
+		'valueOf',
+		'hasOwnProperty',
+		'isPrototypeOf',
+		'propertyIsEnumerable',
+		'constructor'
+	],
+	dontEnumsLength = dontEnums.length,
+	getObjectKeys = Object.keys || function (object) {
+		var keys = [];
+		for (var name in object) {
+			if (object.hasOwnProperty(name)) {
+				keys.push(name);
+			}
+		}
+
+		if (has('bug-for-in-skips-shadowed')) {
+            for (var i = 0, ii = dontEnumsLength; i < ii; i++) {
+                var dontEnum = dontEnums[i];
+                if (object.hasOwnProperty(dontEnum)) {
+                    keys.push(dontEnum);
+                }
+            }
+		}
+		return keys;
+	},
+	toString = {}.toString,
+	isArray = function (obj) {
+		return toString.call(obj) === '[object Array]';
+	};
 var ValidatorContext = function (parent) {
 	this.missing = [];
-	this.schemas = parent ? Object.create(parent.schemas) : {};
+	this.schemas = parent ? lang.delegate(parent.schemas) : {};
 };
 
 ValidatorContext.prototype.getSchema = function (url) {
@@ -83,9 +119,9 @@ function recursiveCompare(A, B) {
 		return true;
 	}
 	if (typeof A == "object" && typeof B == "object") {
-		if (Array.isArray(A) != Array.isArray(B)) {
+		if (isArray(A) != isArray(B)) {
 			return false;
-		} else if (Array.isArray(A)) {
+		} else if (isArray(A)) {
 			if (A.length != B.length) {
 				return false
 			}
@@ -134,7 +170,7 @@ ValidatorContext.prototype.validateType = function validateType(data, schema) {
 	var dataType = typeof data;
 	if (data == null) {
 		dataType = "null";
-	} else if (Array.isArray(data)) {
+	} else if (isArray(data)) {
 		dataType = "array";
 	}
 	var allowedTypes = schema.type;
@@ -238,7 +274,7 @@ ValidatorContext.prototype.validateStringPattern = function validateStringPatter
 	return null;
 }
 ValidatorContext.prototype.validateArray = function validateArray(data, schema) {
-	if (!Array.isArray(data)) {
+	if (!isArray(data)) {
 		return null;
 	}
 	return this.validateArrayLength(data, schema)
@@ -279,7 +315,7 @@ ValidatorContext.prototype.validateArrayItems = function validateArrayItems(data
 		return null;
 	}
 	var error;
-	if (Array.isArray(schema.items)) {
+	if (isArray(schema.items)) {
 		for (var i = 0; i < data.length; i++) {
 			if (i < schema.items.length) {
 				if (error = this.validateAll(data[i], schema.items[i])) {
@@ -305,7 +341,7 @@ ValidatorContext.prototype.validateArrayItems = function validateArrayItems(data
 	return null;
 }
 ValidatorContext.prototype.validateObject = function validateObject(data, schema) {
-	if (typeof data != "object" || data == null || Array.isArray(data)) {
+	if (typeof data != "object" || data == null || isArray(data)) {
 		return null;
 	}
 	return this.validateObjectMinMaxProperties(data, schema)
@@ -316,7 +352,7 @@ ValidatorContext.prototype.validateObject = function validateObject(data, schema
 }
 
 ValidatorContext.prototype.validateObjectMinMaxProperties = function validateObjectMinMaxProperties(data, schema) {
-	var keys = Object.keys(data);
+	var keys = getObjectKeys(data);
 	if (schema.minProperties != undefined) {
 		if (keys.length < schema.minProperties) {
 			return new ValidationError(ErrorCodes.OBJECT_PROPERTIES_MINIMUM, "Too few properties defined (" + keys.length + "), minimum " + schema.minProperties).prefixWith(null, "minProperties");
@@ -388,7 +424,7 @@ ValidatorContext.prototype.validateObjectDependencies = function validateObjectD
 					if (data[dep] === undefined) {
 						return new ValidationError(ErrorCodes.OBJECT_DEPENDENCY_KEY, "Dependency failed - key must exist: " + dep).prefixWith(null, depKey).prefixWith(null, "dependencies");
 					}
-				} else if (Array.isArray(dep)) {
+				} else if (isArray(dep)) {
 					for (var i = 0; i < dep.length; i++) {
 						var requiredKey = dep[i];
 						if (data[requiredKey] === undefined) {
@@ -535,7 +571,7 @@ function normSchema(schema, baseUri) {
 		schema.id = baseUri;
 	}
 	if (typeof schema == "object") {
-		if (Array.isArray(schema)) {
+		if (isArray(schema)) {
 			for (var i = 0; i < schema.length; i++) {
 				normSchema(schema[i], baseUri);
 			}
@@ -666,7 +702,6 @@ var publicApi = {
 	errorCodes: ErrorCodes
 };
 
-global.tv4 = publicApi;
+return publicApi;
 
-})((typeof module !== 'undefined' && module.exports) ? exports : this);
-
+});
